@@ -32,6 +32,7 @@ class Fourinarow extends Rooms.RoomGame {
 		this.player2 = user2;
 		this.player = user1;
 		this.winner = 0;
+		this.last;
 	}
 
 	play(column, user) {
@@ -53,6 +54,7 @@ class Fourinarow extends Rooms.RoomGame {
 						{
 						this.board[i][column] = symbol;
 						played = true;
+						this.last = [column];
 						}
 				}
 			for(var i=0;i<6;i++) // checkwinhorizontal -
@@ -109,12 +111,12 @@ class Fourinarow extends Rooms.RoomGame {
 	}
 
 	generateWindow() {
-		return "&#124;" + this.board[5][0] + "&#124;" + this.board[5][1] + "&#124;" + this.board[5][2] + "&#124;" + this.board[5][3] + "&#124;" + this.board[5][4] + "&#124;" + this.board[5][5] + "&#124;" + this.board[5][6] + "&#124;" + "<br>" +
+		return ("&#124;" + this.board[5][0] + "&#124;" + this.board[5][1] + "&#124;" + this.board[5][2] + "&#124;" + this.board[5][3] + "&#124;" + this.board[5][4] + "&#124;" + this.board[5][5] + "&#124;" + this.board[5][6] + "&#124;" + "<br>" +
 				"&#124;" + this.board[4][0] + "&#124;" + this.board[4][1] + "&#124;" + this.board[4][2] + "&#124;" + this.board[4][3] + "&#124;" + this.board[4][4] + "&#124;" + this.board[4][5] + "&#124;" + this.board[4][6] + "&#124;" + "<br>" +
 				"&#124;" + this.board[3][0] + "&#124;" + this.board[3][1] + "&#124;" + this.board[3][2] + "&#124;" + this.board[3][3] + "&#124;" + this.board[3][4] + "&#124;" + this.board[3][5] + "&#124;" + this.board[3][6] + "&#124;" + "<br>" +
 				"&#124;" + this.board[2][0] + "&#124;" + this.board[2][1] + "&#124;" + this.board[2][2] + "&#124;" + this.board[2][3] + "&#124;" + this.board[2][4] + "&#124;" + this.board[2][5] + "&#124;" + this.board[2][6] + "&#124;" + "<br>" +
 				"&#124;" + this.board[1][0] + "&#124;" + this.board[1][1] + "&#124;" + this.board[1][2] + "&#124;" + this.board[1][3] + "&#124;" + this.board[1][4] + "&#124;" + this.board[1][5] + "&#124;" + this.board[1][6] + "&#124;" + "<br>" +
-				"&#124;" + this.board[0][0] + "&#124;" + this.board[0][1] + "&#124;" + this.board[0][2] + "&#124;" + this.board[0][3] + "&#124;" + this.board[0][4] + "&#124;" + this.board[0][5] + "&#124;" + this.board[0][6] + "&#124;";
+				"&#124;" + this.board[0][0] + "&#124;" + this.board[0][1] + "&#124;" + this.board[0][2] + "&#124;" + this.board[0][3] + "&#124;" + this.board[0][4] + "&#124;" + this.board[0][5] + "&#124;" + this.board[0][6] + "&#124;").replace(/[0]/g, "_");
 	}
 
 	display(user, broadcast) {
@@ -127,9 +129,11 @@ class Fourinarow extends Rooms.RoomGame {
 	
 	display2(user, broadcast) {
 		if (broadcast) {
-			this.room.add('|uhtmlchange|fourinarow' + this.room.gameNumber + '|' + this.generateWindow());
+			this.room.add('|uhtmlchange|fourinarow' + this.room.gameNumber + '|' + this.generateWindow() + "<br>" +
+					"Last move played into column " + this.last);
 		} else {
-			user.sendTo(this.room, '|uhtmlchange|fourinarow' + this.room.gameNumber + '|' + this.generateWindow());
+			user.sendTo(this.room, '|uhtmlchange|fourinarow' + this.room.gameNumber + '|' + this.generateWindow()  + "<br>" +
+					"Last move played into column " + this.last);
 		}
 	}
 
