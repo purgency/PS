@@ -36,12 +36,13 @@ class Fourinarow extends Rooms.RoomGame {
 	}
 
 	play(column, user) {
-		if(user != this.player)
+		if(user != this.player || column < 0 || column > 6)
 		{
 			return 0;
 		}
 		else
 		{
+			this.last = column + 1;
 			if(this.winner === 0)
 			{
 			let symbol = 0;	
@@ -54,7 +55,6 @@ class Fourinarow extends Rooms.RoomGame {
 						{
 						this.board[i][column] = symbol;
 						played = true;
-						this.last = [column];
 						}
 				}
 			for(var i=0;i<6;i++) // checkwinhorizontal -
@@ -178,7 +178,7 @@ exports.commands = {
 			if (!room.game || room.game.gameid !== 'fourinarow') return this.errorReply("There is no game of fourinarow running in this room.");
 			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 
-			var result = room.game.play(target, user);
+			var result = room.game.play(target - 1, user);
 			if(result == 2){
 				room.game.display2(user, true);
 			}
@@ -190,10 +190,10 @@ exports.commands = {
 			}
 			else if(result == 0)
 			{
-				this.sendReply("it's not your turn");
+				this.sendReply("either it's not your turn or the entered move is invalid");
 			}
 		},
-		playhelp: ["/fourinarow play [column] - Playes move into specified column. Column 0 at far left"],
+		playhelp: ["/fourinarow play [column] - Playes move into specified column. Column 1 at far left"],
 
 		stop: 'end',
 		end: function (target, room, user) {
@@ -222,7 +222,7 @@ exports.commands = {
 	fourinarowhelp: ["/fourinarow allows users to play the popular game fourinarow in PS rooms.",
 				"Accepts the following commands:",
 				"/fourinarow create [user1], [user2] - Makes a new game. Requires: % @ # & ~",
-				"/fourinarow play [column] - Playes a move for the column specified. Column 0 is the one to the far left. shortcut: /fplay [column]",
+				"/fourinarow play [column] - Playes a move for the column specified. Column 1 is the one to the far left. shortcut: /fplay [column]",
 				"/fourinarow display - Displays the game.",
 				"/fourinarow end - Ends the game of hangman before the man is hanged or word is guessed. Requires: % @ # & ~"],
 
@@ -230,7 +230,7 @@ exports.commands = {
 		if (!room.game || room.game.gameid !== 'fourinarow') return this.errorReply("There is no game of fourinarow running in this room.");
 		if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 
-		var result = room.game.play(target, user);
+		var result = room.game.play(target - 1, user);
 		if(result == 2){
 			room.game.display2(user, true);
 		}
@@ -242,7 +242,7 @@ exports.commands = {
 		}
 		else if(result == 0)
 		{
-			this.sendReply("it's not your turn");
+			this.sendReply("either it's not your turn or the entered move is invalid");
 		}
 	},
 	playhelp: ["/fplay - Shortcut for /fourinarow play.", "/fourinarow play [column] - Playes into the column specified."]
