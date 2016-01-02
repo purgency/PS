@@ -99,7 +99,7 @@ exports.commands = {
 		create: 'new',
 		new: function (target, room, user) {
 			let params = target.split(',');
-			let playernum;
+			let playernum = target.match(/,/g).length + 1;
 			let user1;
 			let user2;
 			let user3;
