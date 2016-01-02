@@ -28,15 +28,15 @@ class Fourinarow extends Rooms.RoomGame {
 		              [0,0,0,0,0,0,0],
 		              [0,0,0,0,0,0,0],
 		              ];
-		this.player1 = user1;
-		this.player2 = user2;
-		this.player = user1;
+		this.player1 = user1.name;
+		this.player2 = user2.name;
+		this.player = user1.name;
 		this.winner = 0;
 		this.last;
 	}
 
 	play(column, user) {
-		if(user != this.player || column < 0 || column > 6)
+		if(user.name != this.player || column < 0 || column > 6)
 		{
 			return 0;
 		}
@@ -46,7 +46,7 @@ class Fourinarow extends Rooms.RoomGame {
 			if(this.winner === 0)
 			{
 			let symbol = 0;	
-			user == this.player1? symbol = 1 : symbol = 2;
+			user.name == this.player1? symbol = 1 : symbol = 2;
 			let played = false;
 			
 			for(var i=0;i<6;i++)
@@ -165,7 +165,7 @@ exports.commands = {
 				if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 				if (room.game) return this.errorReply("There is already a game in progress in this room.");
 	
-				room.game = new Fourinarow(room, this.targetUserOrSelf(user1, true), this.targetUserOrSelf(user2, true));
+				room.game = new Fourinarow(room,  this.targetUserOrSelf(user1, true), this.targetUserOrSelf(user2, true));
 				room.game.display(user, true);
 				this.add("Player 1: " + user1 + " - Player 2: " + user2);
 	
