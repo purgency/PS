@@ -169,7 +169,7 @@ exports.commands = {
 				room.game.display(user, true);
 				this.add("Player 1: " + user1 + " - Player 2: " + user2);
 	
-				return this.privateModCommand("(A game of Fourinarow was started by " + user1.name + ".)");
+				return this.privateModCommand("(A game of Fourinarow was started by " + user.name + ".)");
 			}
 		},
 		createhelp: ["/fourinarow create [user1], [user2] - Makes a new hangman game. Requires: % @ # & ~"],
