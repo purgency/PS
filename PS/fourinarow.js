@@ -32,15 +32,17 @@ class Fourinarow extends Rooms.RoomGame {
 		this.player2 = user2;
 		this.player = user1;
 		this.winner = 0;
+		this.last;
 	}
 
 	play(column, user) {
-		if(user != this.player)
+		if(user != this.player || column < 0 || column > 6)
 		{
 			return 0;
 		}
 		else
 		{
+			this.last = column + 1;
 			if(this.winner === 0)
 			{
 			let symbol = 0;	
@@ -109,12 +111,12 @@ class Fourinarow extends Rooms.RoomGame {
 	}
 
 	generateWindow() {
-		return "&#124;" + this.board[5][0] + "&#124;" + this.board[5][1] + "&#124;" + this.board[5][2] + "&#124;" + this.board[5][3] + "&#124;" + this.board[5][4] + "&#124;" + this.board[5][5] + "&#124;" + this.board[5][6] + "&#124;" + "<br>" +
+		return ("&#124;" + this.board[5][0] + "&#124;" + this.board[5][1] + "&#124;" + this.board[5][2] + "&#124;" + this.board[5][3] + "&#124;" + this.board[5][4] + "&#124;" + this.board[5][5] + "&#124;" + this.board[5][6] + "&#124;" + "<br>" +
 				"&#124;" + this.board[4][0] + "&#124;" + this.board[4][1] + "&#124;" + this.board[4][2] + "&#124;" + this.board[4][3] + "&#124;" + this.board[4][4] + "&#124;" + this.board[4][5] + "&#124;" + this.board[4][6] + "&#124;" + "<br>" +
 				"&#124;" + this.board[3][0] + "&#124;" + this.board[3][1] + "&#124;" + this.board[3][2] + "&#124;" + this.board[3][3] + "&#124;" + this.board[3][4] + "&#124;" + this.board[3][5] + "&#124;" + this.board[3][6] + "&#124;" + "<br>" +
 				"&#124;" + this.board[2][0] + "&#124;" + this.board[2][1] + "&#124;" + this.board[2][2] + "&#124;" + this.board[2][3] + "&#124;" + this.board[2][4] + "&#124;" + this.board[2][5] + "&#124;" + this.board[2][6] + "&#124;" + "<br>" +
 				"&#124;" + this.board[1][0] + "&#124;" + this.board[1][1] + "&#124;" + this.board[1][2] + "&#124;" + this.board[1][3] + "&#124;" + this.board[1][4] + "&#124;" + this.board[1][5] + "&#124;" + this.board[1][6] + "&#124;" + "<br>" +
-				"&#124;" + this.board[0][0] + "&#124;" + this.board[0][1] + "&#124;" + this.board[0][2] + "&#124;" + this.board[0][3] + "&#124;" + this.board[0][4] + "&#124;" + this.board[0][5] + "&#124;" + this.board[0][6] + "&#124;";
+				"&#124;" + this.board[0][0] + "&#124;" + this.board[0][1] + "&#124;" + this.board[0][2] + "&#124;" + this.board[0][3] + "&#124;" + this.board[0][4] + "&#124;" + this.board[0][5] + "&#124;" + this.board[0][6] + "&#124;").replace(/[0]/g, "_");
 	}
 
 	display(user, broadcast) {
@@ -127,9 +129,11 @@ class Fourinarow extends Rooms.RoomGame {
 	
 	display2(user, broadcast) {
 		if (broadcast) {
-			this.room.add('|uhtmlchange|fourinarow' + this.room.gameNumber + '|' + this.generateWindow());
+			this.room.add('|uhtmlchange|fourinarow' + this.room.gameNumber + '|' + this.generateWindow() + "<br>" +
+					"Last move played into column " + this.last);
 		} else {
-			user.sendTo(this.room, '|uhtmlchange|fourinarow' + this.room.gameNumber + '|' + this.generateWindow());
+			user.sendTo(this.room, '|uhtmlchange|fourinarow' + this.room.gameNumber + '|' + this.generateWindow()  + "<br>" +
+					"Last move played into column " + this.last);
 		}
 	}
 
@@ -174,7 +178,7 @@ exports.commands = {
 			if (!room.game || room.game.gameid !== 'fourinarow') return this.errorReply("There is no game of fourinarow running in this room.");
 			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 
-			var result = room.game.play(target, user);
+			var result = room.game.play(target - 1, user);
 			if(result == 2){
 				room.game.display2(user, true);
 			}
@@ -186,10 +190,10 @@ exports.commands = {
 			}
 			else if(result == 0)
 			{
-				this.sendReply("it's not your turn");
+				this.sendReply("either it's not your turn or the entered move is invalid");
 			}
 		},
-		playhelp: ["/fourinarow play [column] - Playes move into specified column. Column 0 at far left"],
+		playhelp: ["/fourinarow play [column] - Playes move into specified column. Column 1 at far left"],
 
 		stop: 'end',
 		end: function (target, room, user) {
@@ -218,7 +222,7 @@ exports.commands = {
 	fourinarowhelp: ["/fourinarow allows users to play the popular game fourinarow in PS rooms.",
 				"Accepts the following commands:",
 				"/fourinarow create [user1], [user2] - Makes a new game. Requires: % @ # & ~",
-				"/fourinarow play [column] - Playes a move for the column specified. Column 0 is the one to the far left. shortcut: /fplay [column]",
+				"/fourinarow play [column] - Playes a move for the column specified. Column 1 is the one to the far left. shortcut: /fplay [column]",
 				"/fourinarow display - Displays the game.",
 				"/fourinarow end - Ends the game of hangman before the man is hanged or word is guessed. Requires: % @ # & ~"],
 
@@ -226,7 +230,7 @@ exports.commands = {
 		if (!room.game || room.game.gameid !== 'fourinarow') return this.errorReply("There is no game of fourinarow running in this room.");
 		if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 
-		var result = room.game.play(target, user);
+		var result = room.game.play(target - 1, user);
 		if(result == 2){
 			room.game.display2(user, true);
 		}
@@ -238,7 +242,7 @@ exports.commands = {
 		}
 		else if(result == 0)
 		{
-			this.sendReply("it's not your turn");
+			this.sendReply("either it's not your turn or the entered move is invalid");
 		}
 	},
 	playhelp: ["/fplay - Shortcut for /fourinarow play.", "/fourinarow play [column] - Playes into the column specified."]
