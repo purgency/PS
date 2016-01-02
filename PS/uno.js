@@ -1,5 +1,5 @@
 /*
-* "Four in a row" chat plugin for Pokemon Showdown
+* "Uno" chat plugin for Pokemon Showdown
 * By syLph, based on hangman by bumbadadabum and Zarel
 */
 
@@ -35,6 +35,8 @@ class Uno extends Rooms.RoomGame {
 			this.players[i] = [deck[0+counter], deck[1+counter], deck[2+counter], deck[3+counter], deck[4+counter], deck[5+counter], deck[6+counter]];
 			this.counter += 7;
 		}
+		this.currentcard = deck[this.counter];
+		this.counter++;
 		this.player = user1;
 		this.winner = 0;
 	}
@@ -97,25 +99,31 @@ exports.commands = {
 		create: 'new',
 		new: function (target, room, user) {
 			let params = target.split(',');
-			let user1 = params[0];
+			let playernum = target.match(/,/g).length + 1;
+			let user1;
+			let user2;
+			let user3;
+			let user4;
+			let user5;
+			let user6;
+			user1 = params[0];
 			//let user2,3,4...else
 			if (!this.can(permission, null, room)) return false;
 			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 			if (room.game) return this.errorReply("There is already a game in progress in this room.");
 
-			room.game = new Uno(room, this.targetUserOrSelf(user1, true), this.targetUserOrSelf(user2, true));
+			room.game = new Uno(room, playernum, user1, user2, user3, user4, user5, user6);
 			room.game.display(user, true);
-			this.add("Player 1: " + user1 + " - Player 2: " + user2);
 
-			return this.privateModCommand("(A game of Uno was started by " + user1.name + ".)");
+			return this.privateModCommand("(A game of Uno was started by " + user.name + ".)");
 		},
-		createhelp: ["/uno create [user1], [user2] - Makes a new hangman game. Requires: % @ # & ~"],
+		createhelp: ["/uno create [user1], [user2],... - Makes a new Uno game. Requires: % @ # & ~"],
 
 		play: function (target, room, user) {
-			if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of uno running in this room.");
+			if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
 			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 
-			var result = room.game.play(target - 1, user);
+			var result = room.game.play(target, user);
 			if(result == 2){
 				room.game.display2(user, true);
 			}
@@ -130,7 +138,7 @@ exports.commands = {
 				this.sendReply("either it's not your turn or the entered move is invalid");
 			}
 		},
-		playhelp: ["/uno play [column] - Playes move into specified column. Column 1 at far left"],
+		playhelp: ["/uno play [card] - Plays card"],
 
 		stop: 'end',
 		end: function (target, room, user) {
@@ -139,12 +147,12 @@ exports.commands = {
 			if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of uno running in this room.");
 
 			room.game.end();
-			return this.privateModCommand("(The game of Four in a row was ended by " + user.name + ".)");
+			return this.privateModCommand("(The game of Uno was ended by " + user.name + ".)");
 		},
 		endhelp: ["/uno end - Ends the game of Four in a row. Requires: % @ # & ~"],
 
 		display: function (target, room, user) {
-			if (!room.game || room.game.title !== 'Uno') return this.errorReply("There is no game of Four in a row running in this room.");
+			if (!room.game || room.game.title !== 'Uno') return this.errorReply("There is no game of Uno running in this room.");
 			if (!this.canBroadcast()) return;
 			room.update();
 
@@ -158,29 +166,13 @@ exports.commands = {
 
 	unohelp: ["/uno allows users to play the popular game uno in PS rooms.",
 				"Accepts the following commands:",
-				"/uno create [user1], [user2] - Makes a new game. Requires: % @ # & ~",
-				"/uno play [column] - Playes a move for the column specified. Column 1 is the one to the far left. shortcut: /fplay [column]",
+				"/uno create [user1], [user2],... - Makes a new game. Requires: % @ # & ~",
+				"/uno play [card] - Plays specified card. shortcut: /uplay [card]",
 				"/uno display - Displays the game.",
-				"/uno end - Ends the game of hangman before the man is hanged or word is guessed. Requires: % @ # & ~"],
+				"/uno end - Ends the game of uno. Requires: % @ # & ~"],
 
 	uplay: function (target, room, user) {
-		if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of uno running in this room.");
-		if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
-
-		var result = room.game.play(target - 1, user);
-		if(result == 2){
-			room.game.display2(user, true);
-		}
-		else if(result == 1)
-		{
-			room.game.display(user, true);
-			this.add("wooh, we have a winner ._.");
-			room.game.finish();
-		}
-		else if(result == 0)
-		{
-			this.sendReply("either it's not your turn or the entered move is invalid");
-		}
+		//coming soon
 	},
-	playhelp: ["/uplay - Shortcut for /uno play.", "/uno play [column] - Playes into the column specified."]
+	playhelp: ["/uplay - Shortcut for /uno play.", "/uno play [column] - Plays specified card."]
 };

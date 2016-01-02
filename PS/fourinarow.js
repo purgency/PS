@@ -102,10 +102,10 @@ class Fourinarow extends Rooms.RoomGame {
 			}
 			}
 			
-			this.player == this.player1 ? this.player = this.player2 : this.player = this.player1;
 			if (this.winner !== 0) {
 				return 1;
 			}
+			this.player == this.player1 ? this.player = this.player2 : this.player = this.player1;
 			return 2;
 		}
 	}
@@ -185,7 +185,7 @@ exports.commands = {
 			else if(result == 1)
 			{
 				room.game.display(user, true);
-				this.add("wooh, we have a winner ._.");
+				this.add("wooh, we have a winner ._. Congrats " + room.game.player + "!");
 				room.game.finish();
 			}
 			else if(result == 0)
@@ -237,7 +237,7 @@ exports.commands = {
 		else if(result == 1)
 		{
 			room.game.display(user, true);
-			this.add("wooh, we have a winner ._.");
+			this.add("wooh, we have a winner ._. Congrats " + room.game.player + "!");
 			room.game.finish();
 		}
 		else if(result == 0)
