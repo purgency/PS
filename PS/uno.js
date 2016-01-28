@@ -8,7 +8,7 @@
 const permission = 'announce';
 
 class Uno extends Rooms.RoomGame {
-	constructor(room, numberusers, user1, user2, user3, user4, user5, user6) {
+	constructor(room, numberusers, users, target) {
 		super(room);
 
 		if (room.gameNumber) {
@@ -20,53 +20,100 @@ class Uno extends Rooms.RoomGame {
 		this.gameid = 'uno';
 		this.title = 'Uno';
 
+		this.playernames = target.split(',');
+		this.allplayers = users;
+		this.allplayersdecksizes = new Array();
+		for (var i = 0 ; i < this.playernum ; i++) {
+			this.allplayersdecksizes[i] = 7;
+		}
 		this.playernum = numberusers;
 		
-		var deck = ["blue1", "blue2", "blue3", "blue4", "blue5", "blue6", "blue7", "blue8", "blue9", "blue2x", "blueInvert", "blueSkip", 
-		             "red1", "red2", "red3", "red4", "red5", "red6", "red7", "red8", "red9", "red2x", "redInvert", "redSkip",
-		             "yellow1", "yellow2", "yellow3", "yellow4", "yellow5", "yellow6", "yellow7", "yellow8", "yellow9", "yellow2x", "yellowInvert", "yellowSkip",
-		             "green1", "green2", "green3", "green4", "green5", "green6", "green7", "green8", "green9", "green2x", "greenInvert", "greenSkip",
-		             "wish", "wish", "wish", "wish", "wish4x", "wish4x", "wish4x", "wish4x",];
-		this.deck = shuffle(deck);
-		this.players = [numberusers];
-		this.counter = 0;
+		this.deck = ["blue|1", "blue|2", "blue|3", "blue|4", "blue|5", "blue|6", "blue|7", "blue|8", "blue|9", "blue|2x", "blue|Invert", "blue|skip", 
+		             "red|1", "red|2", "red|3", "red|4", "red|5", "red|6", "red|7", "red|8", "red|9", "red|2x", "red|Invert", "red|skip",
+		             "yellow|1", "yellow|2", "yellow|3", "yellow|4", "yellow|5", "yellow|6", "yellow|7", "yellow|8", "yellow|9", "yellow|2x", "yellow|Invert", "yellow|skip",
+		             "green|1", "green|2", "green|3", "green|4", "green|5", "green|6", "green|7", "green|8", "green|9", "green|2x", "green|Invert", "green|skip",
+		             "wish|", "wish|", "wish|", "wish|", "wish|4x", "wish|4x", "wish|4x", "wish|4x",];
+		this.deck = shufflecards(this.deck);
+		this.playersdeck = new Array(numberusers);
 		for(var i = 0; i < numberusers; i++)
 		{
-			this.players[i] = [deck[0+counter], deck[1+counter], deck[2+counter], deck[3+counter], deck[4+counter], deck[5+counter], deck[6+counter]];
-			this.counter += 7;
+			this.playersdeck[i] = [this.deck.shift(), this.deck.shift(), this.deck.shift(), this.deck.shift(), this.deck.shift(), this.deck.shift(), this.deck.shift()];
 		}
-		this.currentcard = deck[this.counter];
-		this.counter++;
-		this.player = user1;
+		this.currentcard = this.deck.shift();
+		this.playeronmovenumber = 0;
+		this.player = users[0];
 		this.winner = 0;
+		this.wishforcolor = false;
+		this.drawcards = 0;
+		this.invert = false;
+		this.skip = false;
+		this.checkrun = false;
 	}
 
-	function shuffle(array) {
-		  var m = array.length, t, i;
-
-		  // While there remain elements to shuffle…
-		  while (m) {
-
-		    // Pick a remaining element…
-		    i = Math.floor(Math.random() * m--);
-
-		    // And swap it with the current element.
-		    t = array[m];
-		    array[m] = array[i];
-		    array[i] = t;
-		  }
-
-		  return array;
-		}
-	
 	play(card, user) {
-		
+		if (this.checkrun || (user === this.player && cardinhand(card, this.playersdeck[this.playeronmovenumber]))){
+			let attributes = card.split('|');
+			let attributescurrent = this.currentcard.split('|');
+			if (attributes[0] === attributescurrent[0] || attributes[0] === "wish" || attributescurrent[0] === "any" || attributes[1] === attributescurrent[1]){
+				if(!this.checkrun) {
+					if (attributes[1] === "2x"){
+						this.drawcards += 2;
+					}
+					else if(attributes[1] === "Invert"){
+						this.invert = !this.invert;
+					}
+					else if(attributes[1] === "skip"){
+						this.skip = true
+					}
+					else if(attributes[1] === "4x"){
+						this.drawcards += 4;
+					}
+					if (attributes[0] === "wish"){
+						this.wishforcolor = true;
+					}
+					var index = this.playersdeck[this.playeronmovenumber].indexOf(card);
+					this.playersdeck[this.playeronmovenumber].splice(index, 1);
+					this.allplayersdecksizes[this.playeronmovenumber] -= 1;
+					if(this.allplayersdecksizes[this.playeronmovenumber] === 0) {
+						this.room.add("Congrats " + this.playernames[this.playeronmovenumer] + " you have won");
+						end();
+					}
+					this.deck.push(this.currentcard);
+					this.currentcard = card;
+					var before = this.playeronmovenumber;
+					if (this.invert){
+						this.playeronmovenumber = mod(this.playeronmovenumber + 1, this.playernum);
+					}
+					else {
+						this.playeronmovenumber = mod(this.playeronmovenumber - 1, this.playernum);
+					}
+					this.player = this.playeronmovenumber;
+					checknextplayer(this, this.playeronmovenumber, before);
+					
+				}
+				else {
+					return true;
+				}
+			}
+			else {
+				user.sendTo(this.room, "you can't play this card ._.");
+				user.sendTo(this.room, "you wanted to play " + card + " with the attributes" + attributes[0] + " and " + attributes[1] + "<br>" + "the current card is " + this.currentcard + " with the attributes " + attributescurrent[0] + " and " + attributescurrent[1] + " " + yourcardsare(this, this.playeronmovenumber));
+				return false;
+			}
+		}
+		else {
+			user.sendTo(this.room, "Nah ._.");
+		}
 	}
 
 	generateWindow() {
-		return "";
+		for(var i = 0 ; i < this.playernum ; i++){
+			this.allplayers[i].sendTo(this.room, yourcardsare(this, i))
+		}
+		return "The current card is: " + this.currentcard + "<br>" +
+		this.playernames[this.playeronmovenumber] + " please choose your card";
 	}
-
+	
 	display(user, broadcast) {
 		if (broadcast) {
 			this.room.add('|uhtml|uno' + this.room.gameNumber + '|' + this.generateWindow());
@@ -77,7 +124,7 @@ class Uno extends Rooms.RoomGame {
 	
 	display2(user, broadcast) {
 		if (broadcast) {
-			this.room.add('|uhtmlchange|uno' + this.room.gameNumber + '|' + this.generateWindow());
+			this.room.add('|uhtml|uno' + this.room.gameNumber + '|' + this.generateWindow());
 		} else {
 			user.sendTo(this.room, '|uhtmlchange|uno' + this.room.gameNumber + '|' + this.generateWindow());
 		}
@@ -100,43 +147,27 @@ exports.commands = {
 		new: function (target, room, user) {
 			let params = target.split(',');
 			let playernum = target.match(/,/g).length + 1;
-			let user1;
-			let user2;
-			let user3;
-			let user4;
-			let user5;
-			let user6;
-			user1 = params[0];
-			//let user2,3,4...else
+			let users = new Array();
+			for(var i = 0 ; i < playernum ; i++){
+				users[i] = this.targetUserOrSelf(params[i], true);
+			}
 			if (!this.can(permission, null, room)) return false;
 			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 			if (room.game) return this.errorReply("There is already a game in progress in this room.");
 
-			room.game = new Uno(room, playernum, user1, user2, user3, user4, user5, user6);
+			room.game = new Uno(room, playernum, users, target);
 			room.game.display(user, true);
 
 			return this.privateModCommand("(A game of Uno was started by " + user.name + ".)");
 		},
-		createhelp: ["/uno create [user1], [user2],... - Makes a new Uno game. Requires: % @ # & ~"],
+		createhelp: ["/uno create [user1],[user2],... - Makes a new Uno game. Requires: % @ # & ~"],
 
 		play: function (target, room, user) {
 			if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
 			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 
-			var result = room.game.play(target, user);
-			if(result == 2){
-				room.game.display2(user, true);
-			}
-			else if(result == 1)
-			{
-				room.game.display(user, true);
-				this.add("wooh, we have a winner ._.");
-				room.game.finish();
-			}
-			else if(result == 0)
-			{
-				this.sendReply("either it's not your turn or the entered move is invalid");
-			}
+			room.game.play(target, user);
+			room.game.display(user, true);
 		},
 		playhelp: ["/uno play [card] - Plays card"],
 
@@ -176,3 +207,87 @@ exports.commands = {
 	},
 	playhelp: ["/uplay - Shortcut for /uno play.", "/uno play [column] - Plays specified card."]
 };
+
+function shufflecards(array) {
+	  var m = array.length, t, i;
+
+	  // While there remain elements to shuffle…
+	  while (m) {
+
+	    // Pick a remaining element…
+	    i = Math.floor(Math.random() * m--);
+
+	    // And swap it with the current element.
+	    t = array[m];
+	    array[m] = array[i];
+	    array[i] = t;
+	  }
+
+	  return array;
+	}
+
+function yourcardsare(uno, i) {
+	var string = "Your cards are";
+	uno.playersdeck[i].forEach(function(entry) {
+		string += " " + entry;
+	});
+	return string;
+}
+
+function cardinhand(card, hand) {
+	var bool = false;
+	hand.forEach(function(entry) {
+		if(card === entry) {
+			bool = true;
+		}
+	});
+	return bool;
+}
+
+function checknextplayer(uno, c, b) {
+	uno.checkrun = true;
+	var bool = false;
+	
+	if(uno.drawcards > 0) {
+		uno.playersdeck[c].forEach(function(entry) {
+			let attributes = entry.split('|');
+			if(attributes[1] === "2x" || attributes[1] === "4x") {
+				bool = true;
+			}
+		});
+		if(!bool){
+			uno.room.add(uno.room, uno.playernames[c] + " had to draw" + uno.drawcards + " cards!");
+			while(uno.drawcards !== 0){
+				uno.playersdeck[c].push(uno.deck.shift());
+				uno.drawcards--;
+			}
+		}
+	}
+	else if(uno.wishforcolor) {
+		uno.room.add(uno.room, uno.allplayers[b] + "Please choose the next color.");
+	}
+	else if(uno.skip){
+		uno.playersdeck[c].forEach(function(entry) {
+			let attributes = entry.split('|');
+			if(attributes[1] === "skip") {
+				bool = true;
+			}
+		});
+	}
+	else {
+		uno.playersdeck[c].forEach(function(entry) {
+			bool = uno.play(entry, uno.player);
+		});
+		if(!bool){
+			uno.room.add(uno.room, uno.playernames[c] + " had to draw a card!");
+			uno.playersdeck[c].push(uno.deck.shift());
+		}
+	}
+	
+	uno.checkrun = false;
+	return bool;
+}
+
+function mod(n, m) {
+    return ((n % m) + m) % m;
+}
