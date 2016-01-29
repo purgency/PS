@@ -193,6 +193,7 @@ exports.commands = {
 			let users = new Array();
 			for(var i = 0 ; i < playernum ; i++){
 				users[i] = this.targetUserOrSelf(params[i], true);
+				if(typeof(users[i]) == "undefined") return this.errorReply("Invalid user");
 			}
 			if (!this.can(permission, null, room)) return false;
 			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
