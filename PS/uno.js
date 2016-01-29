@@ -271,7 +271,7 @@ exports.commands = {
 		var x = room.game.play(target, user);
 		if(!(x === "finish" || x === "nah")) room.game.display(user, true);
 	},
-	playhelp: ["/uplay - Shortcut for /uno play.", "/uno play [column] - Plays specified card."]
+	playhelp: ["/uplay - Shortcut for /uno play.", "/uno play [card] - Plays specified card."]
 };
 
 function shufflecards(array) {
