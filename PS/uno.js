@@ -249,7 +249,7 @@ exports.commands = {
 
 	unohelp: ["/uno allows users to play the popular game uno in PS rooms.",
 				"Accepts the following commands:",
-				"/uno create [user1], [user2],... - Makes a new game. Requires: % @ # & ~",
+				"/uno create [user1],[user2],... - Makes a new game. Requires: % @ # & ~",
 				"/uno play [card] - Plays specified card. shortcut: /uplay [card]",
 				"/uno color [color] - Chooses a color after a wish card is played. shortcut: /ucolor [color]",
 				"/uno display - Displays the game.",
