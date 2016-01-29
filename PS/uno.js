@@ -209,7 +209,7 @@ exports.commands = {
 			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 
 			var x = room.game.play(target, user);
-			if(!x === "finish") room.game.display(user, true);
+			if(!(x === "finish")) room.game.display(user, true);
 		},
 		playhelp: ["/uno play [card] - Plays card"],
 		
@@ -268,7 +268,7 @@ exports.commands = {
 		if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 
 		var x = room.game.play(target, user);
-		if(!x === "finish") room.game.display(user, true);
+		if(!(x === "finish")) room.game.display(user, true);
 	},
 	playhelp: ["/uplay - Shortcut for /uno play.", "/uno play [column] - Plays specified card."]
 };
