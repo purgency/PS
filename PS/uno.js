@@ -21,8 +21,8 @@ class Uno extends Rooms.RoomGame {
 		this.title = 'Uno';
 
 		this.allplayers = users;
-		this.allplayersdecksizes = new Array();
-		for (var i = 0 ; i < this.playernum ; i++) {
+		this.allplayersdecksizes = new Array(numberusers);
+		for (var i = 0 ; i < numberusers ; i++) {
 			this.allplayersdecksizes[i] = 7;
 		}
 		this.playernum = numberusers;
@@ -103,27 +103,29 @@ class Uno extends Rooms.RoomGame {
 					this.playersdeck[this.playeronmovenumber].splice(index, 1);
 					this.allplayersdecksizes[this.playeronmovenumber] -= 1;
 					if(this.allplayersdecksizes[this.playeronmovenumber] === 0) {
-						this.room.add("Congrats " + this.allplayers[this.playeronmovenumer].name + " you have won");
-						end();
-					}
-					this.deck.push(this.currentcard);
-					this.currentcard = card;
-					this.room.add(user.name + " played " + card);
-					
-					if(this.wishforcolor) {
-						this.room.add(this.allplayers[this.playeronmovenumber].name + " please choose the next color.");
+						this.room.add("Congrats " + user.name + " you have won");
+						this.room.game.end();
+						return "finish";
 					} else {
-						var bool = false
-						while(!bool){
-							if (this.invert){
-								this.playeronmovenumber = mod(this.playeronmovenumber + 1, this.playernum);
+						this.deck.push(this.currentcard);
+						this.currentcard = card;
+						this.room.add(user.name + " played " + card);
+						
+						if(this.wishforcolor) {
+							this.room.add(this.allplayers[this.playeronmovenumber].name + " please choose the next color.");
+						} else {
+							var bool = false
+							while(!bool){
+								if (this.invert){
+									this.playeronmovenumber = mod(this.playeronmovenumber + 1, this.playernum);
+								}
+								else {
+									this.playeronmovenumber = mod(this.playeronmovenumber - 1, this.playernum);
+								}
+								this.player = this.allplayers[this.playeronmovenumber];
+								
+								bool = checknextplayer(this, this.playeronmovenumber);
 							}
-							else {
-								this.playeronmovenumber = mod(this.playeronmovenumber - 1, this.playernum);
-							}
-							this.player = this.allplayers[this.playeronmovenumber];
-							
-							bool = checknextplayer(this, this.playeronmovenumber);
 						}
 					}
 				}
@@ -146,6 +148,7 @@ class Uno extends Rooms.RoomGame {
 			this.allplayers[i].sendTo(this.room, yourcardsare(this, i))
 		}
 		return "The current card is: " + this.currentcard + "<br>" +
+		getdecksizes(this) + "<br>" +
 		this.allplayers[this.playeronmovenumber].name + " please choose your card";
 	}
 	
@@ -205,8 +208,8 @@ exports.commands = {
 			if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
 			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 
-			room.game.play(target, user);
-			room.game.display(user, true);
+			var x = room.game.play(target, user);
+			if(!x === "finish") room.game.display(user, true);
 		},
 		playhelp: ["/uno play [card] - Plays card"],
 		
@@ -308,6 +311,7 @@ function checknextplayer(uno, c) {
 			while(uno.drawcards !== 0){
 				uno.playersdeck[c].push(uno.deck.shift());
 				uno.drawcards--;
+				uno.allplayersdecksizes[c] += 1;
 			}
 		}
 	}
@@ -327,6 +331,7 @@ function checknextplayer(uno, c) {
 		if(!bool){
 			uno.room.add(uno.allplayers[c].name + " had to draw a card!");
 			uno.playersdeck[c].push(uno.deck.shift());
+			uno.allplayersdecksizes[c] += 1;
 		}
 	}
 	
@@ -336,4 +341,12 @@ function checknextplayer(uno, c) {
 
 function mod(n, m) {
     return ((n % m) + m) % m;
+}
+
+function getdecksizes(uno){
+	var string = "";
+	for(var i = 0 ; i < uno.playernum ; i++){
+		string = string + (uno.allplayers[i].name + " has " + uno.allplayersdecksizes[i] + " cards. ");
+	}
+	return string;
 }
