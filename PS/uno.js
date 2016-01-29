@@ -71,8 +71,10 @@ class Uno extends Rooms.RoomGame {
 				
 				bool = checknextplayer(this, this.playeronmovenumber);
 			}
+			return true;
 		} else {
 			user.sendTo(this.room, "nah ._.");
+			return false;
 		}
 	}
 
@@ -80,7 +82,7 @@ class Uno extends Rooms.RoomGame {
 		if (this.checkrun || (!this.wishforcolor && user === this.player && cardinhand(card, this.playersdeck[this.playeronmovenumber]))){
 			let attributes = card.split('|');
 			let attributescurrent = this.currentcard.split('|');
-			if (attributes[0] === attributescurrent[0] || attributes[0] === "wish" || attributes[1] === attributescurrent[1]){
+			if (!(this.drawcards > 0 && !(attributes[1] === "2x" || attributes[1] === "4x")) && !(this.skip === true && attributescurrent[1] === "skip" && !(attributes[1] === "skip"))  && (attributes[0] === attributescurrent[0] || attributes[0] === "wish" || attributes[1] === attributescurrent[1])){
 				if(!this.checkrun) {
 					if (attributes[1] === "2x"){
 						this.drawcards += 2;
@@ -212,8 +214,8 @@ exports.commands = {
 			if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
 			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 
-			room.game.choosecolor(target, user);
-			room.game.display(user, true);
+			var valid = room.game.choosecolor(target, user);
+			if(valid) room.game.display(user, true);
 		},
 		colorhelp: ["/uno color [color] - Chooses color"],
 
@@ -316,6 +318,7 @@ function checknextplayer(uno, c) {
 				bool = true;
 			}
 		});
+		if(!bool) uno.skip = false;
 	}
 	else {
 		uno.playersdeck[c].forEach(function(entry) {
