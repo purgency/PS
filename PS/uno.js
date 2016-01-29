@@ -8,7 +8,7 @@
 const permission = 'announce';
 
 class Uno extends Rooms.RoomGame {
-	constructor(room, numberusers, users, target) {
+	constructor(room, numberusers, users) {
 		super(room);
 
 		if (room.gameNumber) {
@@ -20,7 +20,7 @@ class Uno extends Rooms.RoomGame {
 		this.gameid = 'uno';
 		this.title = 'Uno';
 
-		this.allplayers = users;
+		this.allplayers = shufflecards(users);
 		this.allplayersdecksizes = new Array(numberusers);
 		for (var i = 0 ; i < numberusers ; i++) {
 			this.allplayersdecksizes[i] = 7;
@@ -140,6 +140,7 @@ class Uno extends Rooms.RoomGame {
 		}
 		else {
 			user.sendTo(this.room, "Nah ._.");
+			return "nah";
 		}
 	}
 
@@ -197,7 +198,7 @@ exports.commands = {
 			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 			if (room.game) return this.errorReply("There is already a game in progress in this room.");
 
-			room.game = new Uno(room, playernum, users, target);
+			room.game = new Uno(room, playernum, users);
 			room.game.display(user, true);
 
 			return this.privateModCommand("(A game of Uno was started by " + user.name + ".)");
@@ -209,7 +210,7 @@ exports.commands = {
 			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 
 			var x = room.game.play(target, user);
-			if(!(x === "finish")) room.game.display(user, true);
+			if(!(x === "finish" || x === "nah")) room.game.display(user, true);
 		},
 		playhelp: ["/uno play [card] - Plays card"],
 		
@@ -268,7 +269,7 @@ exports.commands = {
 		if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 
 		var x = room.game.play(target, user);
-		if(!(x === "finish")) room.game.display(user, true);
+		if(!(x === "finish" || x === "nah")) room.game.display(user, true);
 	},
 	playhelp: ["/uplay - Shortcut for /uno play.", "/uno play [column] - Plays specified card."]
 };
