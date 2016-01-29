@@ -27,18 +27,18 @@ class Uno extends Rooms.RoomGame {
 		}
 		this.playernum = numberusers;
 		
-		this.deck = ["blue|1", "blue|2", "blue|3", "blue|4", "blue|5", "blue|6", "blue|7", "blue|8", "blue|9", "blue|2x", "blue|Invert", "blue|skip", 
-		             "red|1", "red|2", "red|3", "red|4", "red|5", "red|6", "red|7", "red|8", "red|9", "red|2x", "red|Invert", "red|skip",
-		             "yellow|1", "yellow|2", "yellow|3", "yellow|4", "yellow|5", "yellow|6", "yellow|7", "yellow|8", "yellow|9", "yellow|2x", "yellow|Invert", "yellow|skip",
-		             "green|1", "green|2", "green|3", "green|4", "green|5", "green|6", "green|7", "green|8", "green|9", "green|2x", "green|Invert", "green|skip",
-		             "wish|", "wish|", "wish|", "wish|", "wish|4x", "wish|4x", "wish|4x", "wish|4x",];
+		this.deck = ["blue.1", "blue.2", "blue.3", "blue.4", "blue.5", "blue.6", "blue.7", "blue.8", "blue.9", "blue.2x", "blue.Invert", "blue.skip", 
+		             "red.1", "red.2", "red.3", "red.4", "red.5", "red.6", "red.7", "red.8", "red.9", "red.2x", "red.Invert", "red.skip",
+		             "yellow.1", "yellow.2", "yellow.3", "yellow.4", "yellow.5", "yellow.6", "yellow.7", "yellow.8", "yellow.9", "yellow.2x", "yellow.Invert", "yellow.skip",
+		             "green.1", "green.2", "green.3", "green.4", "green.5", "green.6", "green.7", "green.8", "green.9", "green.2x", "green.Invert", "green.skip",
+		             "wish.", "wish.", "wish.", "wish.", "wish.4x", "wish.4x", "wish.4x", "wish.4x",];
 		this.deck = shufflecards(this.deck);
 		this.playersdeck = new Array(numberusers);
 		for(var i = 0; i < numberusers; i++)
 		{
 			this.playersdeck[i] = [this.deck.shift(), this.deck.shift(), this.deck.shift(), this.deck.shift(), this.deck.shift(), this.deck.shift(), this.deck.shift()];
 		}
-		while(this.deck[0].split('|')[0] === "wish" || this.deck[0].split('|')[1] === "2x" || this.deck[0].split('|')[1] === "4x") {
+		while(this.deck[0].split('.')[0] === "wish" || this.deck[0].split('.')[1] === "2x" || this.deck[0].split('.')[1] === "4x") {
 			this.deck = shufflecards(this.deck);
 		}
 		this.currentcard = this.deck.shift();
@@ -55,7 +55,7 @@ class Uno extends Rooms.RoomGame {
 	
 	choosecolor(color, user){
 		if((color === "blue" || color === "yellow" || color === "red" || color === "green") && this.wishforcolor && (this.invert ? this.allplayers[mod(this.playeronmovenumber - 1, this.playernum)] : this.allplayers[mod(this.playeronmovenumber + 1, this.playernum)])){
-			this.currentcard = color + "|any";
+			this.currentcard = color + ".any";
 			this.wishforcolor = false;
 			this.room.add(user.name + " wished for a " + color + " card");
 			
@@ -80,8 +80,8 @@ class Uno extends Rooms.RoomGame {
 
 	play(card, user) {
 		if (this.checkrun || (!this.wishforcolor && user === this.player && cardinhand(card, this.playersdeck[this.playeronmovenumber]))){
-			let attributes = card.split('|');
-			let attributescurrent = this.currentcard.split('|');
+			let attributes = card.split('.');
+			let attributescurrent = this.currentcard.split('.');
 			if (!(this.drawcards > 0 && !(attributes[1] === "2x" || attributes[1] === "4x")) && !(this.skip === true && attributescurrent[1] === "skip" && !(attributes[1] === "skip"))  && (attributes[0] === attributescurrent[0] || attributes[0] === "wish" || attributes[1] === attributescurrent[1])){
 				if(!this.checkrun) {
 					if (attributes[1] === "2x"){
@@ -298,7 +298,7 @@ function checknextplayer(uno, c) {
 	
 	if(uno.drawcards > 0) {
 		uno.playersdeck[c].forEach(function(entry) {
-			let attributes = entry.split('|');
+			let attributes = entry.split('.');
 			if(attributes[1] === "2x" || attributes[1] === "4x") {
 				bool = true;
 			}
@@ -313,7 +313,7 @@ function checknextplayer(uno, c) {
 	}
 	else if(uno.skip){
 		uno.playersdeck[c].forEach(function(entry) {
-			let attributes = entry.split('|');
+			let attributes = entry.split('.');
 			if(attributes[1] === "skip") {
 				bool = true;
 			}
