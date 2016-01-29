@@ -250,11 +250,25 @@ exports.commands = {
 				"Accepts the following commands:",
 				"/uno create [user1], [user2],... - Makes a new game. Requires: % @ # & ~",
 				"/uno play [card] - Plays specified card. shortcut: /uplay [card]",
+				"/uno color [color] - Chooses a color after a wish card is played. shortcut: /ucolor [color]",
 				"/uno display - Displays the game.",
 				"/uno end - Ends the game of uno. Requires: % @ # & ~"],
+				
+	ucolor: function (target, room, user){
+		if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
+		if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
+
+		var valid = room.game.choosecolor(target, user);
+		if(valid) room.game.display(user, true);
+	},
+	colorhelp: ["/uno color [color] - Chooses color"],
 
 	uplay: function (target, room, user) {
-		//coming soon
+		if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
+		if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
+
+		var x = room.game.play(target, user);
+		if(!x === "finish") room.game.display(user, true);
 	},
 	playhelp: ["/uplay - Shortcut for /uno play.", "/uno play [column] - Plays specified card."]
 };
