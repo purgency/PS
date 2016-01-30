@@ -17,6 +17,9 @@ class Uno extends Rooms.RoomGame {
 			room.gameNumber = 1;
 		}
 
+//		swag();
+//		this.room.addRaw('<button type="button" onclick="swag()">' + "click me" + '</button>');
+		
 		this.gameid = 'uno';
 		this.title = 'Uno';
 
@@ -91,7 +94,7 @@ class Uno extends Rooms.RoomGame {
 			}
 			return true;
 		} else {
-			id.sendTo(this.room, "nah ._.");
+			user.sendTo(this.room, "nah ._.");
 			return false;
 		}
 	}
@@ -127,7 +130,7 @@ class Uno extends Rooms.RoomGame {
 					this.playersdeck[this.playeronmovenumber].splice(index, 1);
 					this.allplayersdecksizes[this.playeronmovenumber] -= 1;
 					if(this.allplayersdecksizes[this.playeronmovenumber] === 0) {
-						this.room.add("Congrats " + user + " you have won");
+						this.room.addRaw('<div class="broadcast-blue"><strong>' + "Congrats " + user + " you have won" + '</strong></div>');
 						this.room.game.end();
 						return "finish";
 					} else {
@@ -137,6 +140,7 @@ class Uno extends Rooms.RoomGame {
 						
 						if(this.wishforcolor) {
 							this.room.add(this.allplayers[this.playeronmovenumber] + " please choose the next color.");
+							createcolorbuttons(this, this.playeronmovenumber);
 						} else {
 							var bool = false
 							while(!bool){
@@ -173,7 +177,7 @@ class Uno extends Rooms.RoomGame {
 
 	generateWindow() {
 		for(var i = 0 ; i < this.playernum ; i++){
-			this.allids[i].sendTo(this.room, yourcardsare(this, i))
+			if(i ==! this.playeronmovenumber) this.allids[i].sendTo(this.room, yourcardsare(this, i))
 		}
 		return "The current card is: " + this.currentcard + (this.drawcards > 0 ? " | drawcards is active" : "") + "<br>" +
 		getdecksizes(this) + "<br>" +
@@ -187,6 +191,7 @@ class Uno extends Rooms.RoomGame {
 			} else {
 				id.sendTo(this.room, '|uhtml|uno' + this.room.gameNumber + '|' + this.generateWindow());
 			}
+			createbuttons(this, this.playeronmovenumber);
 		}
 	}
 	
@@ -197,6 +202,7 @@ class Uno extends Rooms.RoomGame {
 			} else {
 				id.sendTo(this.room, '|uhtmlchange|uno' + this.room.gameNumber + '|' + this.generateWindow());
 			}
+			createbuttons(this, this.playeronmovenumber);
 		}
 	}
 
@@ -401,4 +407,46 @@ function getdecksizes(uno){
 		string = string + (uno.allplayers[i] + " has " + uno.allplayersdecksizes[i] + " cards. ");
 	}
 	return string;
+}
+
+function createbuttons(uno, i){
+	var string = "";
+	var x = uno.allplayersdecksizes[i];
+	for(var k = 0; k < x ; k++){
+		string = string + '<button type="button" onclick="return move(uno, i, k)">' + uno.playersdeck[i][k] + '</button>';
+	}
+	uno.allids[i].sendTo(uno.room,'|raw|' + string);
+}
+
+function move(uno, i, k){
+	uno.room.game.play(uno.playersdeck[i][k], uno.allplayers[i], uno.allids[i]);
+}
+
+function createcolorbuttons(uno, i){
+	var string = "";
+	string = string + '<button type="button" onclick="redbutton(\'' + uno + '\')">' + "red" + '</button>';
+	string = string + '<button type="button" onclick="bluebutton(uno, i)">' + "blue" + '</button>';
+	string = string + '<button type="button" onclick="greenbutton(uno, i)">' + "green" + '</button>';
+	string = string + '<button type="button" onclick="yellowbutton(uno, i)">' + "yellow" + '</button>';
+	uno.allids[i].sendTo(uno.room,'|raw|' + string);
+}
+
+function redbutton(uno){
+	uno.room.game.choosecolor("red", uno.allids[uno.playeronmovenumber]);
+}
+
+function bluebutton(uno, i){
+	uno.room.game.choosecolor("blue", uno.allids[i]);
+}
+
+function greenbutton(uno, i){
+	uno.room.game.choosecolor("green", uno.allids[i]);
+}
+
+function yellowbutton(uno, i){
+	uno.room.game.choosecolor("yellow", uno.allids[i]);
+}
+
+function swag(){
+	console.log("swag");
 }
