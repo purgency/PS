@@ -143,7 +143,10 @@ class Uno extends Rooms.RoomGame {
 				}
 			}
 			else {
-				if(!this.checkrun) id.sendTo(this.room, "you can't play this card ._.");
+				if(!this.checkrun){
+					id.sendTo(this.room, "you can't play this card ._.");
+					return "nah";
+				}
 				return false;
 			}
 		}
@@ -157,7 +160,7 @@ class Uno extends Rooms.RoomGame {
 		for(var i = 0 ; i < this.playernum ; i++){
 			this.allids[i].sendTo(this.room, yourcardsare(this, i))
 		}
-		return "The current card is: " + this.currentcard + "<br>" +
+		return "The current card is: " + this.currentcard + (this.drawcards > 0 ? " | drawcards is active" : "") + "<br>" +
 		getdecksizes(this) + "<br>" +
 		this.allplayers[this.playeronmovenumber] + " please choose your card";
 	}
