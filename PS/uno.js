@@ -91,7 +91,7 @@ class Uno extends Rooms.RoomGame {
 		if (this.checkrun || (!this.wishforcolor && user === this.player && cardinhand(card, this.playersdeck[this.playeronmovenumber]))){
 			let attributes = card.split('.');
 			let attributescurrent = this.currentcard.split('.');
-			if (!(this.drawcards > 0 && !(attributes[1] === "2x" || attributes[1] === "4x")) && !(this.skip === true && attributescurrent[1] === "skip" && !(attributes[1] === "skip"))  && (attributes[0] === attributescurrent[0] || attributes[0] === "wish" || attributes[1] === attributescurrent[1])){
+			if (this.drawcards > 0 && (attributes[1] === "2x" || attributes[1] === "4x") || (!(this.drawcards > 0 && !(attributes[1] === "2x" || attributes[1] === "4x")) && !(this.skip === true && attributescurrent[1] === "skip" && !(attributes[1] === "skip"))  && (attributes[0] === attributescurrent[0] || attributes[0] === "wish" || attributes[1] === attributescurrent[1]))){
 				if(!this.checkrun) {
 					if (attributes[1] === "2x"){
 						this.drawcards += 2;
