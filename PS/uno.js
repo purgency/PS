@@ -75,7 +75,7 @@ class Uno extends Rooms.RoomGame {
 		if((color === "blue" || color === "yellow" || color === "red" || color === "green") && this.wishforcolor && (this.invert ? this.allplayers[mod(this.playeronmovenumber - 1, this.playernum)] : this.allplayers[mod(this.playeronmovenumber + 1, this.playernum)])){
 			this.currentcard = color + ".any";
 			this.wishforcolor = false;
-			this.room.add(user.name + " wished for a " + color + " card");
+			this.room.add('|uhtml|uno' + user.name + " wished for a " + color + " card");
 			
 			var bool = false
 			while(!bool){
@@ -133,10 +133,10 @@ class Uno extends Rooms.RoomGame {
 					} else {
 						this.deck.push(this.currentcard);
 						this.currentcard = card;
-						this.room.add(user + " played " + card);
+						this.room.add('|uhtml|uno' + user + " played " + card);
 						
 						if(this.wishforcolor) {
-							this.room.add(this.allplayers[this.playeronmovenumber] + " please choose the next color.");
+							this.room.add('|uhtml|uno' + this.allplayers[this.playeronmovenumber] + " please choose the next color.");
 							createcolorbuttons(this, this.playeronmovenumber);
 						} else {
 							var bool = false
@@ -333,7 +333,7 @@ function shufflecards(array) {
 	}
 
 function yourcardsare(uno, i) {
-	var string = "____________Your cards are";
+	var string = '|uhtml|uno' + "____________Your cards are";
 	uno.playersdeck[i].forEach(function(entry) {
 		string += " " + entry;
 	});
@@ -362,7 +362,7 @@ function checknextplayer(uno, c) {
 			}
 		});
 		if(!bool){
-			uno.room.add(uno.allplayers[c] + " had to draw " + uno.drawcards + " cards!");
+			uno.room.add('|uhtml|uno' + uno.allplayers[c] + " had to draw " + uno.drawcards + " cards!");
 			while(uno.drawcards !== 0){
 				uno.playersdeck[c].push(uno.deck.shift());
 				uno.drawcards--;
@@ -384,7 +384,7 @@ function checknextplayer(uno, c) {
 			if(!bool) bool = uno.play(entry, uno.player);
 		});
 		if(!bool){
-			uno.room.add(uno.allplayers[c] + " had to draw a card!");
+			uno.room.add('|uhtml|uno' + uno.allplayers[c] + " had to draw a card!");
 			uno.playersdeck[c].push(uno.deck.shift());
 			uno.allplayersdecksizes[c] += 1;
 		}
