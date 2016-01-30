@@ -20,7 +20,11 @@ class Uno extends Rooms.RoomGame {
 		this.gameid = 'uno';
 		this.title = 'Uno';
 
-		this.allplayers = shufflecards(users);
+		this.allids = shufflecards(users);
+		this.allplayers = new Array(numberusers);
+		for(var i = 0 ; i < numberusers ; i++){
+			this.allplayers[i] = this.allids[i].name;
+		}
 		this.allplayersdecksizes = new Array(numberusers);
 		for (var i = 0 ; i < numberusers ; i++) {
 			this.allplayersdecksizes[i] = 7;
@@ -43,8 +47,7 @@ class Uno extends Rooms.RoomGame {
 		}
 		this.currentcard = this.deck.shift();
 		this.playeronmovenumber = 0;
-		this.player = users[0];
-		this.winner = 0;
+		this.player = this.allplayers[0];
 		this.wishforcolor = false;
 		this.drawcards = 0;
 		this.invert = false;
@@ -73,12 +76,18 @@ class Uno extends Rooms.RoomGame {
 			}
 			return true;
 		} else {
-			user.sendTo(this.room, "nah ._.");
+			id.sendTo(this.room, "nah ._.");
 			return false;
 		}
 	}
+	
+	showcards(id){
+		for(var i = 0 ; i < this.playernum ; i++){
+			if(this.allids[i] === id) id.sendTo(this.room, yourcardsare(this, i));
+		}
+	}
 
-	play(card, user) {
+	play(card, user, id) {
 		if (this.checkrun || (!this.wishforcolor && user === this.player && cardinhand(card, this.playersdeck[this.playeronmovenumber]))){
 			let attributes = card.split('.');
 			let attributescurrent = this.currentcard.split('.');
@@ -103,16 +112,16 @@ class Uno extends Rooms.RoomGame {
 					this.playersdeck[this.playeronmovenumber].splice(index, 1);
 					this.allplayersdecksizes[this.playeronmovenumber] -= 1;
 					if(this.allplayersdecksizes[this.playeronmovenumber] === 0) {
-						this.room.add("Congrats " + user.name + " you have won");
+						this.room.add("Congrats " + user + " you have won");
 						this.room.game.end();
 						return "finish";
 					} else {
 						this.deck.push(this.currentcard);
 						this.currentcard = card;
-						this.room.add(user.name + " played " + card);
+						this.room.add(user + " played " + card);
 						
 						if(this.wishforcolor) {
-							this.room.add(this.allplayers[this.playeronmovenumber].name + " please choose the next color.");
+							this.room.add(this.allplayers[this.playeronmovenumber] + " please choose the next color.");
 						} else {
 							var bool = false
 							while(!bool){
@@ -134,23 +143,23 @@ class Uno extends Rooms.RoomGame {
 				}
 			}
 			else {
-				if(!this.checkrun) user.sendTo(this.room, "you can't play this card ._.");
+				if(!this.checkrun) id.sendTo(this.room, "you can't play this card ._.");
 				return false;
 			}
 		}
 		else {
-			user.sendTo(this.room, "Nah ._.");
+			id.sendTo(this.room, "Nah ._.");
 			return "nah";
 		}
 	}
 
 	generateWindow() {
 		for(var i = 0 ; i < this.playernum ; i++){
-			this.allplayers[i].sendTo(this.room, yourcardsare(this, i))
+			this.allids[i].sendTo(this.room, yourcardsare(this, i))
 		}
 		return "The current card is: " + this.currentcard + "<br>" +
 		getdecksizes(this) + "<br>" +
-		this.allplayers[this.playeronmovenumber].name + " please choose your card";
+		this.allplayers[this.playeronmovenumber] + " please choose your card";
 	}
 	
 	display(user, broadcast) {
@@ -158,7 +167,7 @@ class Uno extends Rooms.RoomGame {
 			if (broadcast) {
 				this.room.add('|uhtml|uno' + this.room.gameNumber + '|' + this.generateWindow());
 			} else {
-				user.sendTo(this.room, '|uhtml|uno' + this.room.gameNumber + '|' + this.generateWindow());
+				id.sendTo(this.room, '|uhtml|uno' + this.room.gameNumber + '|' + this.generateWindow());
 			}
 		}
 	}
@@ -168,7 +177,7 @@ class Uno extends Rooms.RoomGame {
 			if (broadcast) {
 				this.room.add('|uhtml|uno' + this.room.gameNumber + '|' + this.generateWindow());
 			} else {
-				user.sendTo(this.room, '|uhtmlchange|uno' + this.room.gameNumber + '|' + this.generateWindow());
+				id.sendTo(this.room, '|uhtmlchange|uno' + this.room.gameNumber + '|' + this.generateWindow());
 			}
 		}
 	}
@@ -210,10 +219,18 @@ exports.commands = {
 			if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
 			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 
-			var x = room.game.play(target, user);
+			var x = room.game.play(target, user.name, user);
 			if(!(x === "finish" || x === "nah")) room.game.display(user, true);
 		},
 		playhelp: ["/uno play [card] - Plays card"],
+		
+		cards: function (target, room, user){
+			if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
+			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
+
+			room.game.showcards(user);
+		},
+		cardshelp: ["/uno cards - displays your cards"],
 		
 		color: function (target, room, user) {
 			if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
@@ -254,6 +271,7 @@ exports.commands = {
 				"/uno play [card] - Plays specified card. shortcut: /uplay [card]",
 				"/uno color [color] - Chooses a color after a wish card is played. shortcut: /ucolor [color]",
 				"/uno display - Displays the game.",
+				"/uno cards - Displays your cards.",
 				"/uno end - Ends the game of uno. Requires: % @ # & ~"],
 				
 	ucolor: function (target, room, user){
@@ -269,7 +287,7 @@ exports.commands = {
 		if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
 		if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 
-		var x = room.game.play(target, user);
+		var x = room.game.play(target, user.name, user);
 		if(!(x === "finish" || x === "nah")) room.game.display(user, true);
 	},
 	playhelp: ["/uplay - Shortcut for /uno play.", "/uno play [card] - Plays specified card."]
@@ -294,7 +312,7 @@ function shufflecards(array) {
 	}
 
 function yourcardsare(uno, i) {
-	var string = "Your cards are";
+	var string = "____________Your cards are";
 	uno.playersdeck[i].forEach(function(entry) {
 		string += " " + entry;
 	});
@@ -323,7 +341,7 @@ function checknextplayer(uno, c) {
 			}
 		});
 		if(!bool){
-			uno.room.add(uno.allplayers[c].name + " had to draw " + uno.drawcards + " cards!");
+			uno.room.add(uno.allplayers[c] + " had to draw " + uno.drawcards + " cards!");
 			while(uno.drawcards !== 0){
 				uno.playersdeck[c].push(uno.deck.shift());
 				uno.drawcards--;
@@ -345,7 +363,7 @@ function checknextplayer(uno, c) {
 			if(!bool) bool = uno.play(entry, uno.player);
 		});
 		if(!bool){
-			uno.room.add(uno.allplayers[c].name + " had to draw a card!");
+			uno.room.add(uno.allplayers[c] + " had to draw a card!");
 			uno.playersdeck[c].push(uno.deck.shift());
 			uno.allplayersdecksizes[c] += 1;
 		}
@@ -362,7 +380,7 @@ function mod(n, m) {
 function getdecksizes(uno){
 	var string = "";
 	for(var i = 0 ; i < uno.playernum ; i++){
-		string = string + (uno.allplayers[i].name + " has " + uno.allplayersdecksizes[i] + " cards. ");
+		string = string + (uno.allplayers[i] + " has " + uno.allplayersdecksizes[i] + " cards. ");
 	}
 	return string;
 }
