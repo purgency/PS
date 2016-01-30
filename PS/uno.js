@@ -16,9 +16,6 @@ class Uno extends Rooms.RoomGame {
 		} else {
 			room.gameNumber = 1;
 		}
-
-//		swag();
-//		this.room.addRaw('<button type="button" onclick="swag()">' + "click me" + '</button>');
 		
 		this.gameid = 'uno';
 		this.title = 'Uno';
@@ -413,7 +410,168 @@ function createbuttons(uno, i){
 	var string = "";
 	var x = uno.allplayersdecksizes[i];
 	for(var k = 0; k < x ; k++){
-		string = string + '<button type="button" onclick="return move(uno, i, k)">' + uno.playersdeck[i][k] + '</button>';
+	    if(uno.playersdeck[i][k] === "blue.0"){
+			string = string + '<button type="button" value="/uplay blue.0" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "blue.1"){
+			string = string + '<button type="button" value="/uplay blue.1" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "blue.2"){
+			string = string + '<button type="button" value="/uplay blue.2" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "blue.3"){
+			string = string + '<button type="button" value="/uplay blue.3" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "blue.4"){
+			string = string + '<button type="button" value="/uplay blue.4" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "blue.5"){
+			string = string + '<button type="button" value="/uplay blue.5" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "blue.6"){
+			string = string + '<button type="button" value="/uplay blue.6" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "blue.7"){
+			string = string + '<button type="button" value="/uplay blue.7" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "blue.8"){
+			string = string + '<button type="button" value="/uplay blue.8" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "blue.9"){
+			string = string + '<button type="button" value="/uplay blue.9" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "blue.skip"){
+			string = string + '<button type="button" value="/uplay blue.skip" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "blue.Invert"){
+			string = string + '<button type="button" value="/uplay blue.Invert" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "blue.2x"){
+			string = string + '<button type="button" value="/uplay blue.2x" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "red.0"){
+			string = string + '<button type="button" value="/uplay red.0" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "red.1"){
+			string = string + '<button type="button" value="/uplay red.1" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "red.2"){
+			string = string + '<button type="button" value="/uplay red.2" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "red.3"){
+			string = string + '<button type="button" value="/uplay red.3" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "red.4"){
+			string = string + '<button type="button" value="/uplay red.4" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "red.5"){
+			string = string + '<button type="button" value="/uplay red.5" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "red.6"){
+			string = string + '<button type="button" value="/uplay red.6" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "red.7"){
+			string = string + '<button type="button" value="/uplay red.7" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "red.8"){
+			string = string + '<button type="button" value="/uplay red.8" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "red.9"){
+			string = string + '<button type="button" value="/uplay red.9" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "red.skip"){
+			string = string + '<button type="button" value="/uplay red.skip" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "red.Invert"){
+			string = string + '<button type="button" value="/uplay red.Invert" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "red.2x"){
+			string = string + '<button type="button" value="/uplay red.2x" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "green.0"){
+			string = string + '<button type="button" value="/uplay green.0" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "green.1"){
+			string = string + '<button type="button" value="/uplay green.1" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "green.2"){
+			string = string + '<button type="button" value="/uplay green.2" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "green.3"){
+			string = string + '<button type="button" value="/uplay green.3" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "green.4"){
+			string = string + '<button type="button" value="/uplay green.4" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "green.5"){
+			string = string + '<button type="button" value="/uplay green.5" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "green.6"){
+			string = string + '<button type="button" value="/uplay green.6" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "green.7"){
+			string = string + '<button type="button" value="/uplay green.7" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "green.8"){
+			string = string + '<button type="button" value="/uplay green.8" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "green.9"){
+			string = string + '<button type="button" value="/uplay green.9" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "green.skip"){
+			string = string + '<button type="button" value="/uplay green.skip" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "green.Invert"){
+			string = string + '<button type="button" value="/uplay green.Invert" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "green.2x"){
+			string = string + '<button type="button" value="/uplay green.2x" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "yellow.0"){
+			string = string + '<button type="button" value="/uplay yellow.0" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "yellow.1"){
+			string = string + '<button type="button" value="/uplay yellow.1" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "yellow.2"){
+			string = string + '<button type="button" value="/uplay yellow.2" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "yellow.3"){
+			string = string + '<button type="button" value="/uplay yellow.3" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "yellow.4"){
+			string = string + '<button type="button" value="/uplay yellow.4" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "yellow.5"){
+			string = string + '<button type="button" value="/uplay yellow.5" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "yellow.6"){
+			string = string + '<button type="button" value="/uplay yellow.6" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "yellow.7"){
+			string = string + '<button type="button" value="/uplay yellow.7" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "yellow.8"){
+			string = string + '<button type="button" value="/uplay yellow.8" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "yellow.9"){
+			string = string + '<button type="button" value="/uplay yellow.9" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "yellow.skip"){
+			string = string + '<button type="button" value="/uplay yellow.skip" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "yellow.Invert"){
+			string = string + '<button type="button" value="/uplay yellow.Invert" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "yellow.2x"){
+			string = string + '<button type="button" value="/uplay yellow.2x" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "wish."){
+			string = string + '<button type="button" value="/uplay wish." name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
+		else if(uno.playersdeck[i][k] === "wish.4x"){
+			string = string + '<button type="button" value="/uplay wish.4x" name="send">' + uno.playersdeck[i][k] + '</button>';
+		}
 	}
 	uno.allids[i].sendTo(uno.room,'|raw|' + string);
 }
@@ -424,29 +582,9 @@ function move(uno, i, k){
 
 function createcolorbuttons(uno, i){
 	var string = "";
-	string = string + '<button type="button" onclick="redbutton(\'' + uno + '\')">' + "red" + '</button>';
-	string = string + '<button type="button" onclick="bluebutton(uno, i)">' + "blue" + '</button>';
-	string = string + '<button type="button" onclick="greenbutton(uno, i)">' + "green" + '</button>';
-	string = string + '<button type="button" onclick="yellowbutton(uno, i)">' + "yellow" + '</button>';
+	string = string + '<button type="button" value="/ucolor red" name="send">' + "red" + '</button>';
+	string = string + '<button type="button" value="/ucolor blue" name="send">' + "blue" + '</button>';
+	string = string + '<button type="button" value="/ucolor green" name="send">' + "green" + '</button>';
+	string = string + '<button type="button" value="/ucolor yellow" name="send">' + "yellow" + '</button>';
 	uno.allids[i].sendTo(uno.room,'|raw|' + string);
-}
-
-function redbutton(uno){
-	uno.room.game.choosecolor("red", uno.allids[uno.playeronmovenumber]);
-}
-
-function bluebutton(uno, i){
-	uno.room.game.choosecolor("blue", uno.allids[i]);
-}
-
-function greenbutton(uno, i){
-	uno.room.game.choosecolor("green", uno.allids[i]);
-}
-
-function yellowbutton(uno, i){
-	uno.room.game.choosecolor("yellow", uno.allids[i]);
-}
-
-function swag(){
-	console.log("swag");
 }
