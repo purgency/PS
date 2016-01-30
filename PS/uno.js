@@ -54,10 +54,21 @@ class Uno extends Rooms.RoomGame {
 		this.player = this.allplayers[0];
 		this.wishforcolor = false;
 		this.drawcards = 0;
-		this.invert = false;
-		this.skip = false;
+		this.invert = (this.currentcard.split('.')[1] === "invert" ?  true : false);
+		this.skip = (this.currentcard.split('.')[1] === "skip" ?  true : false);
 		this.checkrun = false;
-		checknextplayer(this, 0, 0);
+		var bool = checknextplayer(this, 0, 0);
+		while(!bool){
+			if (this.invert){
+				this.playeronmovenumber = mod(this.playeronmovenumber + 1, this.playernum);
+			}
+			else {
+				this.playeronmovenumber = mod(this.playeronmovenumber - 1, this.playernum);
+			}
+			this.player = this.allplayers[this.playeronmovenumber];
+			
+			bool = checknextplayer(this, this.playeronmovenumber);
+		}
 	}
 	
 	choosecolor(color, user){
