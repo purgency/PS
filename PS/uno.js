@@ -264,6 +264,8 @@ exports.commands = {
 		createhelp: ["/uno create - Makes a new Uno game. Requires: % @ # & ~"],
 
 		join: function (target, room, user){
+			if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
+			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 			if(!room.game.started){
 				if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
 				if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
@@ -275,6 +277,8 @@ exports.commands = {
 		},
 		
 		leave: function (target, room, user){
+			if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
+			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 			if(!room.game.started){
 				if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
 				if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
@@ -286,6 +290,8 @@ exports.commands = {
 		},
 		
 		start: function (target, room, user) {
+			if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
+			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 			if(!room.game.started){
 				let params = room.game.signed;
 				let playernum = params.length;
