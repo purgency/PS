@@ -23,7 +23,7 @@ class Uno extends Rooms.RoomGame {
 		this.signed = new Array();
 		this.started = false;
 		
-		this.room.add("A game of Uno was started by " + name);
+		this.room.add("A game of Uno was created by " + name);
 		this.room.addRaw('<button type="button" value="/uno join" name="send">' + "Join" + '</button>' + '<button type="button" value="/uno leave" name="send">' + "Leave" + '</button>' + '<button type="button" value="/uno start" name="send">' + "Start" + '</button>');
 		
 	}
