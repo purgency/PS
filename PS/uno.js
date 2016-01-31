@@ -7,8 +7,9 @@
 
 const permission = 'announce';
 
+
 class Uno extends Rooms.RoomGame {
-	constructor(room, numberusers, users) {
+	constructor(room, name) {
 		super(room);
 
 		if (room.gameNumber) {
@@ -16,10 +17,45 @@ class Uno extends Rooms.RoomGame {
 		} else {
 			room.gameNumber = 1;
 		}
-		
 		this.gameid = 'uno';
 		this.title = 'Uno';
-
+		
+		this.signed = new Array();
+		this.started = false;
+		
+		this.room.add("A game of Uno was started by " + name);
+		this.room.addRaw('<button type="button" value="/uno join" name="send">' + "Join" + '</button>' + '<button type="button" value="/uno leave" name="send">' + "Leave" + '</button>' + '<button type="button" value="/uno start" name="send">' + "Start" + '</button>');
+		
+	}
+	
+	join(room, name) {
+		var bool = true;
+		this.signed.forEach(function(entry) {
+			if(entry === name) {
+				bool = false;
+			}
+		});
+		if (bool){
+			this.signed.push(name);
+			this.room.add(name + " entered the Uno signups");
+		}
+	}
+	
+	leave(room, name) {
+		var bool = false;
+		this.signed.forEach(function(entry) {
+			if(entry === name) {
+				bool = true;
+			}
+		});
+		if (bool){
+			this.signed.pop(name);
+			this.room.add(name + " left the Uno signups");
+		}
+	}
+		
+	start(room, numberusers, users) {
+		this.started = true;
 		this.allids = shufflecards(users);
 		this.allplayers = new Array(numberusers);
 		for(var i = 0 ; i < numberusers ; i++){
@@ -216,25 +252,61 @@ class Uno extends Rooms.RoomGame {
 
 exports.commands = {
 	uno: {
-		create: 'new',
-		new: function (target, room, user) {
-			let params = target.split(',');
-			let playernum = target.match(/,/g).length + 1;
-			let users = new Array();
-			for(var i = 0 ; i < playernum ; i++){
-				users[i] = this.targetUserOrSelf(params[i], true);
-				if(typeof(users[i]) == "undefined") return this.errorReply("Invalid user");
-			}
+		
+		create: function (target, room, user){
+
 			if (!this.can(permission, null, room)) return false;
 			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 			if (room.game) return this.errorReply("There is already a game in progress in this room.");
-
-			room.game = new Uno(room, playernum, users);
-			room.game.display(user, true);
-
-			return this.privateModCommand("(A game of Uno was started by " + user.name + ".)");
+			
+			room.game = new Uno(room, user.name);
 		},
-		createhelp: ["/uno create [user1],[user2],... - Makes a new Uno game. Requires: % @ # & ~"],
+		createhelp: ["/uno create - Makes a new Uno game. Requires: % @ # & ~"],
+
+		join: function (target, room, user){
+			if(!room.game.started){
+				if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
+				if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
+				
+				room.game.join(room, user.name);
+			} else {
+				return this.errorReply("The game is already in progress");
+			}
+		},
+		
+		leave: function (target, room, user){
+			if(!room.game.started){
+				if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
+				if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
+				
+				room.game.leave(room, user.name);
+			} else {
+				return this.errorReply("The game is already in progress");
+			}	
+		},
+		
+		start: function (target, room, user) {
+			if(!room.game.started){
+				let params = room.game.signed;
+				let playernum = params.length;
+				if(playernum > 1){
+					let users = new Array();
+					for(var i = 0 ; i < playernum ; i++){
+						users[i] = this.targetUserOrSelf(params[i], true);
+						if(typeof(users[i]) == "undefined") return this.errorReply("Invalid user");
+					}
+					
+					room.add(user.name + " started the game");
+		
+					room.game.start(room, playernum, users);
+					room.game.display(user, true);
+				} else {
+					return this.errorReply("not enough players");
+				}
+			} else {
+				return this.errorReply("The game is already in progress");
+			}		
+		},
 
 		play: function (target, room, user) {
 			if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
