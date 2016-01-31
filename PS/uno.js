@@ -455,7 +455,7 @@ function checknextplayer(uno, c) {
 				bool = true;
 			}
 		});
-		if(!bool) uno.skip = false;
+		if(!bool) { uno.skip = false; uno.room.add(uno.allplayers[c] + " was skipped"); }
 	}
 	else {
 		uno.playersdeck[c].forEach(function(entry) {
