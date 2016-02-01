@@ -22,10 +22,26 @@ class Uno extends Rooms.RoomGame {
 		
 		this.signed = new Array();
 		this.started = false;
+		this.cpunames = ["wishXippo#theylikeitrough", "kinnikumanVSippo#returnmywaifu", "stefXdidi33#keepitclean", "syLphXdotsandboxes#noneedforpxssy", "juancarlosXgangstaluv#muchskillsoleet", "winterXdeafgrill#goodlucksunbae", "breynXgoogletranslate#troublemakers", "Jack", "blizzardhailstormofdoom69", "charizardblastermaster"];
+		this.cpus = new Array();
 		
 		this.room.add("A game of Uno was created by " + name);
-		this.room.addRaw('<button type="button" value="/uno join" name="send">' + "Join" + '</button>' + '<button type="button" value="/uno leave" name="send">' + "Leave" + '</button>' + '<button type="button" value="/uno start" name="send">' + "Start" + '</button>');
+		this.room.addRaw('<button type="button" value="/uno join" name="send">' + "Join" + '</button>' + '<button type="button" value="/uno leave" name="send">' + "Leave" + '</button>' + '<button type="button" value="/uno addcpu" name="send">' + "Add cpu" + '</button>' + '<button type="button" value="/uno removecpu" name="send">' + "Remove cpu" + '</button>' + '<button type="button" value="/uno start" name="send">' + "Start" + '</button>');
 		
+	}
+	
+	addcpu(room){
+		if(this.cpus.length < 10){
+			this.cpus.push(shufflecards(this.cpunames).pop());
+			this.room.add(this.cpus[this.cpus.length -1] + " entered the Uno signups");
+		}
+	}
+	
+	removecpu(room){
+		if(this.cpus.length > 0){
+			this.cpunames.push(shufflecards(this.cpus).pop());
+			this.room.add(this.cpunames[this.cpunames.length -1] + " left the Uno signups");
+		}
 	}
 	
 	join(room, name) {
@@ -58,15 +74,31 @@ class Uno extends Rooms.RoomGame {
 		this.started = true;
 		this.allids = shufflecards(users);
 		this.playernum = numberusers;
-		
-		for(var i = 0 ; i < this.playernum ; i++){
-			this.allids[i].sendTo(room, user.name + " started the game");
-		}
+		this.cpumove = false;
 		
 		this.allplayers = new Array(numberusers);
 		for(var i = 0 ; i < numberusers ; i++){
-			this.allplayers[i] = this.allids[i].name;
+			var boola = true;
+			for(var j = 0 ; j < this.cpus.length ; j++){
+				if(this.allids[i] === this.cpus[j]) boola = false;
+			}
+			if(boola) {
+				this.allplayers[i] = this.allids[i].name;
+			} else {
+				this.allplayers[i] = this.allids[i];
+			}
 		}
+		
+		for(var i = 0 ; i < this.playernum ; i++){
+			var boolb = true;
+			for(var j = 0 ; j < this.cpus.length ; j++){
+				if(this.allids[i] === this.cpus[j]) boolb = false;
+			}
+			if(boolb) this.allids[i].sendTo(room, user.name + " started the game");
+		}
+		
+		
+		
 		this.allplayersdecksizes = new Array(numberusers);
 		for (var i = 0 ; i < numberusers ; i++) {
 			this.allplayersdecksizes[i] = 7;
@@ -108,7 +140,18 @@ class Uno extends Rooms.RoomGame {
 			}
 			this.player = this.allplayers[this.playeronmovenumber];
 			
+			
+			
 			bool = checknextplayer(this, this.playeronmovenumber);
+		}
+		var comp = false
+		for(var j = 0 ; j < this.cpus.length ; j++){
+			if(this.player === this.cpus[j]) comp = true;
+		}
+		this.cpumove = comp;
+		if (comp) {
+			var card = checknextplayer(this, this.playeronmovenumber);
+			this.room.game.play(card, this.player, "doesntmatter")
 		}
 	}
 	
@@ -118,7 +161,11 @@ class Uno extends Rooms.RoomGame {
 			this.wishforcolor = false;
 			
 			for(var i = 0 ; i < this.playernum ; i++){
-				this.allids[i].sendTo(this.room, user.name + " wished for a " + color + " card");
+				var boolean = true;
+				for(var j = 0 ; j < this.cpus.length ; j++){
+					if(this.allids[i] === this.cpus[j]) boolean = false;
+				}
+				if(boolean) this.allids[i].sendTo(this.room, this.allplayers[this.playeronmovenumber] + " wished for a " + color + " card");
 			}
 			
 			var bool = false
@@ -133,9 +180,22 @@ class Uno extends Rooms.RoomGame {
 				
 				bool = checknextplayer(this, this.playeronmovenumber);
 			}
+			var comp = false
+			for(var j = 0 ; j < this.cpus.length ; j++){
+				if(this.player === this.cpus[j]) comp = true;
+			}
+			this.cpumove = comp;
+			if (comp) {
+				var card = checknextplayer(this, this.playeronmovenumber);
+				this.room.game.play(card, this.player, "doesntmatter")
+			}
 			return true;
 		} else {
-			user.sendTo(this.room, "nah ._.");
+			var booleanb = true;
+			for(var j = 0 ; j < this.cpus.length ; j++){
+				if(this.allids[this.playeronmovenumber] === this.cpus[j]) booleanb = false;
+			}
+			if(booleanb) user.sendTo(this.room, "nah ._.");
 			return false;
 		}
 	}
@@ -147,7 +207,7 @@ class Uno extends Rooms.RoomGame {
 	}
 
 	play(card, user, id) {
-		if (this.checkrun || (!this.wishforcolor && user === this.player && cardinhand(card, this.playersdeck[this.playeronmovenumber]))){
+		if (this.cpumove || this.checkrun || (!this.wishforcolor && user === this.player && cardinhand(card, this.playersdeck[this.playeronmovenumber]))){
 			let attributes = card.split('.');
 			let attributescurrent = this.currentcard.split('.');
 			if (this.drawcards > 0 && (attributes[1] === "2x" || attributes[1] === "4x") || (!(this.drawcards > 0 && !(attributes[1] === "2x" || attributes[1] === "4x")) && !(this.skip === true && attributescurrent[1] === "skip" && !(attributes[1] === "skip"))  && (attributes[0] === attributescurrent[0] || attributes[0] === "wish" || attributes[1] === attributescurrent[1]))){
@@ -179,12 +239,26 @@ class Uno extends Rooms.RoomGame {
 						this.currentcard = card;
 						
 						for(var i = 0 ; i < this.playernum ; i++){
-							this.allids[i].sendTo(this.room, user + " played " + card);
+							var boolean = true;
+							for(var j = 0 ; j < this.cpus.length ; j++){
+								if(this.allids[i] === this.cpus[j]) boolean = false;
+							}
+							if(boolean) this.allids[i].sendTo(this.room, user + " played " + card);
 						}
 						
 						if(this.wishforcolor) {
-							this.room.add(this.allplayers[this.playeronmovenumber] + " please choose the next color.");
-							createcolorbuttons(this, this.playeronmovenumber);
+							for(var i = 0 ; i < this.playernum ; i++){
+								var boolb = true;
+								for(var j = 0 ; j < this.cpus.length ; j++){
+									if(this.allids[i] === this.cpus[j]) boolb = false;
+								}
+								if(boolb) this.allids[i].sendTo(this.allplayers[this.playeronmovenumber] + " please choose the next color.");
+							}
+							if(!this.cpumove){
+								createcolorbuttons(this, this.playeronmovenumber);
+							} else {
+								this.room.game.choosecolor(shufflecards(["red", "green", "yellow", "blue"])[0], "wayne");
+							}
 						} else {
 							var bool = false
 							while(!bool){
@@ -198,6 +272,15 @@ class Uno extends Rooms.RoomGame {
 								
 								bool = checknextplayer(this, this.playeronmovenumber);
 							}
+							var comp = false
+							for(var j = 0 ; j < this.cpus.length ; j++){
+								if(this.player === this.cpus[j]) comp = true;
+							}
+							this.cpumove = comp;
+							if (comp) {
+								var card = checknextplayer(this, this.playeronmovenumber);
+								this.room.game.play(card, this.player, "doesntmatter")
+							}
 						}
 					}
 				}
@@ -207,7 +290,11 @@ class Uno extends Rooms.RoomGame {
 			}
 			else {
 				if(!this.checkrun){
-					id.sendTo(this.room, "you can't play this card ._.");
+					var booleanz = true;
+					for(var j = 0 ; j < this.cpus.length ; j++){
+						if(this.allids[this.playeronmovenumber] === this.cpus[j]) booleanz = false;
+					}
+					if(booleanz) id.sendTo(this.room, "you can't play this card ._.");
 					return "nah";
 				}
 				return false;
@@ -229,8 +316,12 @@ class Uno extends Rooms.RoomGame {
 		if(!this.wishforcolor){
 			if (broadcast) {
 				for(var i = 0 ; i < this.playernum ; i++){
-					this.allids[i].sendTo(this.room, '|uhtml|uno' + this.room.gameNumber + '|' + this.generateWindow(i));
-					if(i !== this.playeronmovenumber) this.allids[i].sendTo(this.room, yourcardsare(this, i));
+					var booleanz = true;
+					for(var j = 0 ; j < this.cpus.length ; j++){
+						if(this.allids[i] === this.cpus[j]) booleanz = false;
+					}
+					if(booleanz) this.allids[i].sendTo(this.room, '|uhtml|uno' + this.room.gameNumber + '|' + this.generateWindow(i));
+					if(booleanz && i !== this.playeronmovenumber) this.allids[i].sendTo(this.room, yourcardsare(this, i));
 				}
 			} else {
 				id.sendTo(this.room, '|uhtml|uno' + this.room.gameNumber + '|' + this.generateWindow());
@@ -267,8 +358,6 @@ exports.commands = {
 			if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
 			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 			if(!room.game.started){
-				if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
-				if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 				
 				room.game.join(room, user.name);
 			} else {
@@ -280,8 +369,6 @@ exports.commands = {
 			if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
 			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 			if(!room.game.started){
-				if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
-				if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 				
 				room.game.leave(room, user.name);
 			} else {
@@ -293,17 +380,25 @@ exports.commands = {
 			if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
 			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 			if(!room.game.started){
-				let params = room.game.signed;
+				let params = room.game.signed.concat(room.game.cpus);
 				let playernum = params.length;
 				if(playernum > 1){
 					let users = new Array();
 					for(var i = 0 ; i < playernum ; i++){
-						users[i] = this.targetUserOrSelf(params[i], true);
+						var booleany = true;
+						for(var j = 0 ; j < room.game.cpus.length ; j++){
+							if(params[i] === room.game.cpus[j]) booleany = false;
+						}
+						if(booleany){
+							users[i] = this.targetUserOrSelf(params[i], true);
+						} else {
+							users[i] = params[i];
+						}
 						if(typeof(users[i]) == "undefined") return this.errorReply("Invalid user");
 					}
 		
 					room.game.start(room, playernum, users, user);
-					room.game.display(user, true);
+					if(typeof(room.game) != "undefined") room.game.display(user, true);
 				} else {
 					return this.errorReply("not enough players");
 				}
@@ -317,7 +412,7 @@ exports.commands = {
 			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 
 			var x = room.game.play(target, user.name, user);
-			if(!(x === "finish" || x === "nah")) room.game.display(user, true);
+			if(typeof(room.game) != "undefined") room.game.display(user, true);
 		},
 		playhelp: ["/uno play [card] - Plays card"],
 		
@@ -337,6 +432,30 @@ exports.commands = {
 			if(valid) room.game.display(user, true);
 		},
 		colorhelp: ["/uno color [color] - Chooses color"],
+		
+		addcpu: function (target, room, user) {
+			if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
+			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
+			if(!room.game.started){
+				
+				room.game.addcpu(room);
+			} else {
+				return this.errorReply("The game is already in progress");
+			}
+		},
+		addcpuhelp: ["/uno addcpu - Adds a computer player"],
+		
+		removecpu: function (target, room, user) {
+			if (!room.game || room.game.gameid !== 'uno') return this.errorReply("There is no game of Uno running in this room.");
+			if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
+			if(!room.game.started){
+				
+				room.game.removecpu(room);
+			} else {
+				return this.errorReply("The game is already in progress");
+			}
+		},
+		addcpuhelp: ["/uno addcpu - Adds a computer player"],
 
 		stop: 'end',
 		end: function (target, room, user) {
@@ -385,7 +504,7 @@ exports.commands = {
 		if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 
 		var x = room.game.play(target, user.name, user);
-		if(!(x === "finish" || x === "nah")) room.game.display(user, true);
+		if(typeof(room.game) != "undefined") room.game.display(user, true);
 	},
 	playhelp: ["/uplay - Shortcut for /uno play.", "/uno play [card] - Plays specified card."]
 };
@@ -429,17 +548,23 @@ function cardinhand(card, hand) {
 function checknextplayer(uno, c) {
 	uno.checkrun = true;
 	var bool = false;
+	var card = "";
 	
 	if(uno.drawcards > 0) {
 		uno.playersdeck[c].forEach(function(entry) {
 			let attributes = entry.split('.');
 			if(attributes[1] === "2x" || attributes[1] === "4x") {
 				bool = true;
+				if(uno.cpumove && bool) card = entry;
 			}
 		});
 		if(!bool){
 			for(var i = 0 ; i < uno.playernum ; i++){
-				uno.allids[i].sendTo(uno.room, uno.allplayers[c] + " had to draw " + uno.drawcards + " cards!");
+				var booleano = true;
+				for(var j = 0 ; j < uno.cpus.length ; j++){
+					if(uno.allids[i] === uno.cpus[j]) booleano = false;
+				}
+				if(booleano) uno.allids[i].sendTo(uno.room, uno.allplayers[c] + " had to draw " + uno.drawcards + " cards!");
 			}
 			while(uno.drawcards !== 0){
 				uno.playersdeck[c].push(uno.deck.shift());
@@ -453,22 +578,34 @@ function checknextplayer(uno, c) {
 			let attributes = entry.split('.');
 			if(attributes[1] === "skip") {
 				bool = true;
+				if(uno.cpumove && bool) card = entry;
 			}
 		});
 		if(!bool) { 
 			uno.skip = false;
 			for(var i = 0 ; i < uno.playernum ; i++){
-				uno.allids[i].sendTo(uno.room, uno.allplayers[c] + " was skipped");
+				var booleanie = true;
+				for(var j = 0 ; j < uno.cpus.length ; j++){
+					if(uno.allids[i] === uno.cpus[j]) booleanie = false;
+				}
+				if(booleanie) uno.allids[i].sendTo(uno.room, uno.allplayers[c] + " was skipped");
 			}
 		}
 	}
 	else {
 		uno.playersdeck[c].forEach(function(entry) {
-			if(!bool) bool = uno.play(entry, uno.player);
+			if(!bool) {
+				bool = uno.play(entry, uno.player);
+				card = entry;
+			}
 		});
 		if(!bool){
 			for(var i = 0 ; i < uno.playernum ; i++){
-				uno.allids[i].sendTo(uno.room, uno.allplayers[c] + " had to draw a card!");
+				var boolean = true;
+				for(var j = 0 ; j < uno.cpus.length ; j++){
+					if(uno.allids[i] === uno.cpus[j]) boolean = false;
+				}
+				if(boolean) uno.allids[i].sendTo(uno.room, uno.allplayers[c] + " had to draw a card!");
 			}
 			uno.playersdeck[c].push(uno.deck.shift());
 			uno.allplayersdecksizes[c] += 1;
@@ -476,6 +613,7 @@ function checknextplayer(uno, c) {
 	}
 	
 	uno.checkrun = false;
+	if (bool && uno.cpumove) return card;
 	return bool;
 }
 
@@ -658,7 +796,11 @@ function createbuttons(uno, i){
 			string = string + '<button type="button" value="/uplay wish.4x" name="send">' + uno.playersdeck[i][k] + '</button>';
 		}
 	}
-	uno.allids[i].sendTo(uno.room,'|raw|' + string);
+	var boolean = true;
+	for(var j = 0 ; j < uno.cpus.length ; j++){
+		if(uno.allids[i] === uno.cpus[j]) boolean = false;
+	}
+	if(boolean) uno.allids[i].sendTo(uno.room,'|raw|' + string);
 }
 
 function move(uno, i, k){
@@ -671,5 +813,9 @@ function createcolorbuttons(uno, i){
 	string = string + '<button type="button" value="/ucolor blue" name="send">' + "blue" + '</button>';
 	string = string + '<button type="button" value="/ucolor green" name="send">' + "green" + '</button>';
 	string = string + '<button type="button" value="/ucolor yellow" name="send">' + "yellow" + '</button>';
-	uno.allids[i].sendTo(uno.room,'|raw|' + string);
+	var boolean = true;
+	for(var j = 0 ; j < uno.cpus.length ; j++){
+		if(uno.allids[i] === uno.cpus[j]) boolean = false;
+	}
+	if(boolean) uno.allids[i].sendTo(uno.room,'|raw|' + string);
 }
