@@ -473,7 +473,7 @@ exports.commands = {
 			if (!this.canBroadcast()) return;
 			room.update();
 
-			room.game.display(user, this.broadcasting);
+			if(typeof(room.game) != "undefined") room.game.display(user, this.broadcasting);
 		},
 
 		'': function (target, room, user) {
@@ -495,7 +495,7 @@ exports.commands = {
 		if (!this.canTalk()) return this.errorReply("You cannot do this while unable to talk.");
 
 		var valid = room.game.choosecolor(target, user);
-		if(valid) room.game.display(user, true);
+		if(typeof(room.game) != "undefined") room.game.display(user, true);
 	},
 	colorhelp: ["/uno color [color] - Chooses color"],
 
