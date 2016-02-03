@@ -22,7 +22,7 @@ class Uno extends Rooms.RoomGame {
 		
 		this.signed = new Array();
 		this.started = false;
-		this.cpunames = ["wishXippo#theylikeitrough", "kinnikumanVSippo#returnmywaifu", "stefXdidi33#keepitclean", "syLphXdotsandboxes#noneedforpxssy", "juancarlosXgangstaluv#muchskillsoleet", "winterXdeafgrill#goodlucksunbae", "breynXgoogletranslate#troublemakers", "Jack", "blizzardhailstormofdoom69", "charizardblastermaster"];
+		this.cpunames = ["wishXippo#theylikeitrough", "kinnikumanVSippo#returnmywaifu", "stefXdidi33#keepitclean", "Dynamite sexy", "juancarlosXgangstaluv#muchskillsoleet", "winterXdeafgrill#goodlucksunbae", "breynXgoogletranslate#troublemakers", "Jack", "blizzardhailstormofdoom69", "charizardblastermaster"];
 		this.cpus = new Array();
 		
 		this.room.add("A game of Uno was created by " + name);
@@ -31,7 +31,7 @@ class Uno extends Rooms.RoomGame {
 	}
 	
 	addcpu(room){
-		if(this.cpus.length < 10){
+		if(this.cpunames.length > 0){
 			this.cpus.push(shufflecards(this.cpunames).pop());
 			this.room.add(this.cpus[this.cpus.length -1] + " entered the Uno signups");
 		}
