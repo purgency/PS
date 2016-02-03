@@ -22,7 +22,7 @@ class Uno extends Rooms.RoomGame {
 		
 		this.signed = new Array();
 		this.started = false;
-		this.cpunames = ["wishXippo#theylikeitrough", "kinnikumanVSippo#returnmywaifu", "Dynamite sexy", "Jack", "BlizzardHailStormOfDoom69", "CharizardBlastaMaster", "TfishClanx3Hermine<3", "chickenlord123"];
+		this.cpunames = ["wishXippo#theylikeitrough", "kinnikumanVSippo#returnmywaifu", "Dynamite sexy", "Jack", "BlizzardHailStormOfDoom69", "CharizardBlastaMaster", "TfishClanx3Hermine<3", "chickenlord123", "Skarmpiss", "Donald Trump"];
 		this.cpus = new Array();
 		
 		this.room.add("A game of Uno was created by " + name);
